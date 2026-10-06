@@ -1,0 +1,14 @@
+{
+  "gravity": [0, 10],
+  "camera": {"center": [8, 4.5], "zoom": 1.0},
+  "objects": [
+    {"name": "ground", "type": "box", "pos": [8, 8.7], "size": [16, 0.6], "static": true, "color": [90, 90, 110]},
+    {"type": "box", "pos": [0.2, 4.5], "size": [0.4, 9], "static": true, "color": [90, 90, 110]},
+    {"type": "box", "pos": [15.8, 4.5], "size": [0.4, 9], "static": true, "color": [90, 90, 110]},
+    {"type": "box", "pos": [8, 6], "size": [4, 0.3], "static": true, "color": [120, 120, 150]},
+    {"name": "player", "type": "box", "pos": [3, 7.5], "size": [0.8, 0.8], "color": [80, 200, 120], "layer": 2},
+    {"type": "box", "pos": [8, 2], "size": [0.9, 0.9], "color": [230, 160, 60], "restitution": 0.3},
+    {"type": "circle", "pos": [7.5, 0.5], "radius": 0.45, "color": [90, 160, 240], "restitution": 0.7},
+    {"type": "circle", "pos": [9, 0.2], "radius": 0.35, "color": [240, 90, 120], "restitution": 0.8}
+  ]
+}

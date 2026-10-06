@@ -1,0 +1,41 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build python3-dev python3-pytest xvfb \
+            libx11-dev libxrandr-dev libxcursor-dev libudev-dev libgl1-mesa-dev \
+            libfreetype-dev libgl1-mesa-dri libglx-mesa0
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build
+      - name: C++ unit tests
+        run: ctest --test-dir build --output-on-failure
+      - name: Python tests (module + level loader)
+        run: python3 -m pytest tests -v
+      - name: Embedded-Python runtime smoke test (window, render, sprite, layers, loop)
+        run: xvfb-run -a -s "-screen 0 1280x720x24" build/engine_host scripts/smoke_runtime.py
+
+  sanitizers:     # catches leaks / UB / use-after-free in the C++ core
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build python3-dev \
+            libx11-dev libxrandr-dev libxcursor-dev libudev-dev libgl1-mesa-dev libfreetype-dev
+      - name: Build with ASan + UBSan
+        run: |
+          cmake -S . -B build-asan -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer"
+          cmake --build build-asan --target test_physics
+      - name: Run tests under sanitizers
+        run: ASAN_OPTIONS=detect_leaks=1 ./build-asan/test_physics
